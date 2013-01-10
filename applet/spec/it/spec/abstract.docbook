@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sect2 id="descrizione">
+	<title>Descrizione</title>
+	<para>
+		L'applicazione sarà disponibile sul Market di Android. L'utilizzo è
+		quindi vincolato al possesso di uno smartphone con il Sistema
+		Operativo di
+		Google.
+		Inoltre, come ultimo pre-requisito, lo smartphone
+		che
+		ospiterà l'app
+		dovrà disporre dell'antenna GPS la quale dovrà già
+		avere acquisito il segnala prima che l'app sia eseguita.
+
+		<emphasis role="bold"> I servizi contenuti nel modulo base sono:
+		</emphasis>
+		<itemizedlist>
+			<listitem>
+				<para>Identificazione automatica delle coordinate geografiche in
+					tempo reale
+				</para>
+			</listitem>
+			<listitem>
+				<para>Possibilità di bloccare la rilevazione della latitudine e
+					della longitudine (quando si è fisicamente vicini alla fermata) in
+					modo da salvare le coordinate abbinandole alla
+					fermata dell'autobus
+					corrispondente
+				</para>
+			</listitem>
+			<listitem>
+				<para>Possibilità di impostare il codice, la via e il nome della
+					fermata associata alle coordinate geografiche fissate in
+					precedenza
+				</para>
+			</listitem>
+			<listitem>
+				<para>In caso di necessità, l'utente ha la possibilità di inserire
+					delle note riferite alla fermata del bus
+				</para>
+			</listitem>
+			<listitem>
+				<para>I dati saranno salvati nel telefono e verranno backuppati ogni
+					notte in un database remoto
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+	<para>
+		<figure id="android.anteprima">
+			<title>Anteprima dell'applicazione</title>
+			<inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="../spec/it/images/fermate.png"
+						format="PNG" scale="50" />
+				</imageobject>
+			</inlinemediaobject>
+		</figure>
+	</para>
+</sect2>
+	

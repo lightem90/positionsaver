@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="introduction">
+	<title>Introduzione</title>
+	<sect1 id="scopo">
+		<title>Premessa</title>
+		<para> La presente offerta propone la realizzazione degli sviluppi
+			relativi all'applicazione per Android che permette di effettuare il
+			Censimento delle Fermate dell'Autobus.
+		</para>
+		&descrizione.sintetica;
+		<!--<sect2 condition="dettaglio.offerta">-->
+		<sect2>
+			<title>Stima delle attività di sviluppo</title>
+			<table>
+				<title>
+					Dettaglio offerta
+					<footnote>
+						<para>http://it.wikipedia.org/wiki/Informatico</para>
+					</footnote>
+				</title>
+				<tgroup cols="2">
+					<colspec colnum="1" colname="c1" />
+					<colspec colnum="2" colname="c2" />
+					<tbody>
+						<row>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>Modulo Base</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Sviluppo apk e sistema di sincronizzazione dati</para>
+							</entry>
+							<entry>
+								<para>€ 7.700,00</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Sconto</para>
+							</entry>
+							<entry>
+								<para>€ -2.200,00</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Totale</para>
+							</entry>
+							<entry>
+								<para>€ 5.000,00</para>
+							</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</sect2>
+		<sect3>
+			<table orient="land">
+				<title>
+					Dettaglio Offerta
+					<footnote>
+						<para>http://it.wikipedia.org/wiki/Informatico</para>
+					</footnote>
+				</title>
+				<tgroup cols="9">
+					<colspec colnum="1" colname="c1" />
+					<colspec colnum="2" colname="c2" />
+					<colspec colnum="3" colname="c3" />
+					<colspec colnum="4" colname="c4" />
+					<colspec colnum="5" colname="c5" />
+					<colspec colnum="6" colname="c6" />
+					<colspec colnum="7" colname="c7" />
+					<tbody>
+						<row>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>System Integrator</para>
+							</entry>
+							<entry>
+								<para>Analista senior</para>
+							</entry>
+							<entry>
+								<para>Progettista Senior</para>
+							</entry>
+							<entry>
+								<para>Programmatore Senior</para>
+							</entry>
+							<entry>
+								<para>Programmatore Junior</para>
+							</entry>
+							<entry>
+								<para>WebDesigner</para>
+							</entry>
+							<entry>
+								<para>Sistemista Senior</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Sviluppo dell'apk</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>3</para>
+							</entry>
+							<entry>
+								<para>5</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>€ 5.400,00</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Sistema di sincronizzazione dei dati</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>1</para>
+							</entry>
+							<entry>
+								<para>3</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>€ 2.300,00</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Totale</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>€ 7.700,00</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Sconto</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>€ -2.200,00</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Totale Scontato</para>
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para />
+							</entry>
+							<entry>
+								<para>€ 5.000,00</para>
+							</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</sect3>
+	</sect1>
+</chapter>

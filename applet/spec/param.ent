@@ -1,0 +1,11 @@
+
+
+<!ENTITY introofferta SYSTEM "it/offerta/introofferta.docbook">
+
+<!--
+<!ENTITY introduction SYSTEM "it/spec/introduction.docbook">
+-->
+<!ENTITY descrizione.sintetica SYSTEM "it/spec/abstract.docbook">
+
+<!ENTITY abstract 'Descrizione tecnica dei nuovi sviluppi software per Roma Mobilità relativi al CarSharing'>
+	
