@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="tsp" default="deploy" basedir=".">
+
+	<property name="ftp.url.doc" value="ftp.cartsoftware.eu" />
+	<property name="ftp.username.doc" value="136898@aruba.it" />
+	<property name="ftp.password.doc" value="23a7539bdd" />
+	<property name="suffix" value="" />
+	<property name="ftp.folder.doc" value="www.cartsoftware.eu/d/php/${nomeprogetto}${suffix}" />
+	<property name="paramlib" value="" />
+
+
+	<tstamp>
+		<format property="NOW" pattern="yyyyMMdd" />
+	</tstamp>
+
+	<loadfile property="dist.revision" srcFile="./.svn/entries" failonerror="false">
+		<filterchain>
+			<headfilter lines="1" skip="3" />
+			<deletecharacters chars="\n" />
+		</filterchain>
+	</loadfile>
+
+	<condition property="version" value="${NOW}_r${dist.revision}" else="${NOW}">
+		<isset property="dist.revision" />
+	</condition>
+
+
+	<echo message="versione = ${version}">
+	</echo>
+
+	<taskdef name="joomla-install-extension" classname="com.joomboss.InstallExtensionTask">
+		<classpath>
+			<pathelement location="${lib.home}/ant.joomla.jar" />
+		</classpath>
+	</taskdef>
+
+	<taskdef name="joomla-remove-extension" classname="com.joomboss.RemoveExtensionTask">
+		<classpath>
+			<pathelement location="${lib.home}/ant.joomla.jar" />
+		</classpath>
+	</taskdef>
+
+
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${lib.home}/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="doc" depends="phpdoc,archivia">
+	</target>
+	<target name="phpdoc">
+		<delete dir="${basedir}/doc/php">
+		</delete>
+		<exec executable="phpdoc" dir="/home/andreacosta/software/PhpDocumentor">
+			<arg line=" -t ${basedir}/doc/php  -o HTML:frames:earthli,PDF:default:default,XML:DocBook/peardoc2:default   -d ${basedir}/src/ -s on" />
+		</exec>
+		<!--	<apply executable="phpdoc" dir="/home/andreacosta/software/PhpDocumentor">
+		<arg line="-ct type -ue on -t ${basedir}/build/api -tb /PATH/TO/YOUR/PHPUC/DATA/phpdoc -o HTML:Phpuc:phpuc -d src/" />
+	</apply>-->
+	</target>
+	<target name="archivia">
+		<if>
+			<isset property="archivia.doc" />
+			<then>
+				<ftp action="mkdir" password="${ftp.password.doc}" server="${ftp.url.doc}" userid="${ftp.username.doc}" remotedir="${ftp.folder.doc}">
+
+				</ftp>
+				<ftp action="delete" password="${ftp.password.doc}" server="${ftp.url.doc}" userid="${ftp.username.doc}" remotedir="${ftp.folder.doc}" skipfailedtransfers="yes">
+					<fileset>
+
+						<include name="**" />
+					</fileset>
+				</ftp>
+
+				<ftp passive="true" password="${ftp.password.doc}" server="${ftp.url.doc}" userid="${ftp.username.doc}" remotedir="${ftp.folder.doc}">
+					<fileset dir="${basedir}/doc/php" />
+				</ftp>
+			</then>
+
+		</if>
+
+	</target>
+
+
+	<target name="init">
+		<delete dir="build" />
+		<mkdir dir="build" />
+
+		<delete dir="${junit.output.dir}" />
+		<mkdir dir="${junit.output.dir}" />
+		<mkdir dir="build/${nomeprogetto}" />
+
+		<copy includeemptydirs="false" todir="build/${nomeprogetto}">
+			<fileset dir="${javasource}">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+
+
+		</copy>
+		<foreach list="${paramlib}" param="parlib" target="mergesubproject" inheritall="true" delimiter=" ">
+		</foreach>
+
+
+	</target>
+	<target name="test">
+		<!--=======================================================
+		Al momento 06/03/12 failonerror è false perchè non funziona phpunit
+		Ok adesso phpunit fa failonerror=true
+		=============================================================-->
+		<exec dir="${basedir}" executable="phpunit" failonerror="true">
+			<arg line="--log-junit ${junit.output.dir}/phpunit.xml --verbose --include-path ${javasource} --include-path build/${nomeprogetto}  ${javasourcetest}" />
+		</exec>
+
+
+
+	</target>
+
+
+	<!--================================================================-->
+	<!--	report del test sul deploy di test							-->
+	<target name="juniwebtreport">
+		<junitreport todir="${junit.output.dir}">
+			<fileset dir="${junit.output.dir}">
+				<!--<include name="TEST-*.xml" />-->
+				<include name="*.xml" />
+			</fileset>
+			<report format="frames" todir="${junit.output.dir}" />
+		</junitreport>
+		<fail if="junit.failure" message="Unit test(s) failed.  See reports!" />
+
+	</target>
+	<!--================================================================-->
+
+
+	<!-- ================================= 
+          target: deploy              
+         ================================= -->
+	<target name="deploy" depends="init, test,testdeploy,webtest,juniwebtreport" description="description">
+		<antcall target= "zippa">
+		</antcall>
+
+		<antcall target="deploy.joomla">
+		</antcall>
+		<antcall target="deploy.drupal">
+		</antcall>
+
+
+	</target>
+
+	<target name="zippa"  depends="init">
+		<zip destfile="${lib.home}/${nomeprogetto}${suffix}.zip" basedir="build/${nomeprogetto}" update="true" />
+	</target>
+	<target name="deploy.joomla" if="joomlaproject">
+		<trycatch>
+
+			<try>
+
+				<joomla-remove-extension version="${joomla.version}" name="${nomeprogetto}" url="${joomla.url}" adminlogin="${joomla.username}" adminpassword="${joomla.password}" />
+
+			</try>
+			<catch>
+				<echo message="errore nella remove" />
+			</catch>
+		</trycatch>
+		<joomla-install-extension version="${joomla.version}" source="${lib.home}/${nomeprogetto}${suffix}.zip" url="${joomla.url}" adminlogin="${joomla.username}" adminpassword="${joomla.password}" />
+
+	</target>
+
+	<target name="deploy.drupal" if="drupalproject">
+		<!--	<antcall target="doc">
+		</antcall>
+-->
+
+		<mail mailhost="smtp.cartsoftware.eu" mailport="25" subject="Test build" password="0SQtZapO" user="assistenza@cartsoftware.eu" tolist="${listamail}">
+			<from address="assistenza@cartsoftware.eu" />
+			<replyto address="assistenza@cartsoftware.eu" />
+
+			<message>The  nightly build has completed</message>
+			<attachments>
+				<fileset dir="build">
+					<include name="**/*.zip" />
+				</fileset>
+			</attachments>
+		</mail>
+
+
+
+	</target>
+	<target name="testdeploy">
+		<antcall target="testdeploy.drupal">
+		</antcall>
+		<antcall target="testdeploy.joomla">
+		</antcall>
+
+	</target>
+
+	<target name="testdeploy.drupal" if="drupalproject">
+		<sshexec host="${test.drupal.url}" username="${test.drupal.username}" password="${test.drupal.password}" command="mkdir ${test.drupal.dir}/${nomeprogetto}" failonerror="false">
+		</sshexec>
+
+		<scp todir="${test.drupal.username}:${test.drupal.password}@${test.drupal.url}:${test.drupal.dir}/${nomeprogetto}" verbose="true" sftp="true">
+			<fileset dir="build/${nomeprogetto}">
+				<include name="**/*" />
+			</fileset>
+		</scp>
+
+	</target>
+	<!--=============================================
+to be defined
+
+dovrebbe essere 
+1) se il componente è installato (quindi update) fai un ftp diviso in due cartelle components e administrator/compoenents
+2) se non è installato chiama via hhtp la pagina della sezione administator per l'installazione
+=============================================-->
+	<target name="testdeploy.joomla">
+
+	</target>
+	<target name="webtest">
+
+		<!--
+<ant antfile="deploy/deploy.xml" target="testweb">
+		</ant>
+
+-->
+
+
+	</target>
+
+	<!--================================================================-->
+	<!--	merge del web.xml											-->
+
+	<target name="mergesubproject">
+		<echo message="la paramlib è =${parlib}">
+		</echo>
+		<copy todir="build/${nomeprogetto}" overwrite="true" verbose="true">
+			<zipfileset src="${lib.home}/${parlib}">
+				<include name="**/*.ini" />
+
+			</zipfileset>
+		</copy>
+	</target>
+	<!--================================================================-->
+
+</project>
