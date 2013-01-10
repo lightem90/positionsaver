@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tsp" default="install">
+	<!--================================================================-->
+	<!--	defienizione dei task										-->
+
+	<taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+	<taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+
+	<taskdef name="list" classname="org.apache.catalina.ant.ListTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+	<taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+	<taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+	<taskdef name="roles" classname="org.apache.catalina.ant.RolesTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+	<taskdef name="start" classname="org.apache.catalina.ant.StartTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+	<taskdef name="stop" classname="org.apache.catalina.ant.StopTask" classpath="/archivio/deploy/lib/catalina-ant.jar" />
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${lib.home}/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	<!--================================================================-->
+
+
+	<!--================================================================-->
+	<!--	definzione delle property									-->
+
+	<property name="tomcat.url" value="http://cart24:8080" />
+	<property name="tomcat.username" value="admin" />
+	<property name="tomcat.password" value="cv56py" />
+
+	<property name="host.username" value="administrator" />
+	<property name="host.password" value="cv56py" />
+	<property name="host.checkword" value="administrator" />
+	<!--================================================================-->
+	<!--		la host.checkword quello che							-->
+	<!--		 normalemente si trova nel prompt, 						-->
+	<!--		 tipicamente il nome utente								-->
+	<!--================================================================-->
+	<property name="host.tomcat.home" value="e:\Tomcat 5.5" />
+	<property name="suffix" value="" />
+	<!--================================================================-->
+
+	<echo message="tomcat url  :${tomcat.url}" />
+
+	<!--================================================================-->
+	<!--	definizione dei path										-->
+
+	<path id="lib.path.ref">
+		<fileset id="lib.path.ref.fileset" dir="${lib.home}" includes="${dipendenze} ${paramlib}" excludes="**/doc/**" />
+	</path>
+	<!--================================================================-->
+
+
+
+	<!-- <echoproperties></echoproperties>-->
+	<target name="install" depends="-init,vpn-connect,clean,start,deploy,vpn-disconnect" />
+
+
+	<!--================================================================-->
+	<!--	inizializzazione per il deploy								-->
+
+	<target name="-init" if="progettoweb">
+
+		<tempfile property="temp.module.folder" prefix="tomcat" destdir="${java.io.tmpdir}" />
+		<unwar src="${nomeprogetto}${suffix}.war" dest="${temp.module.folder}">
+			<patternset includes="META-INF/context.xml" />
+		</unwar>
+		<xmlproperty file="${temp.module.folder}/META-INF/context.xml" />
+		<delete dir="${temp.module.folder}" />
+
+	</target>
+	<!--================================================================-->
+
+
+
+	<!--================================================================-->
+	<!--	deploy web													-->
+
+	<target name="deploy">
+		<echo message="Deploying file:///${basedir}/${nomeprogetto}.war to ${Context(path)}${suffix}" />
+		<deploy url="${tomcat.url}/manager" username="${tomcat.username}" password="${tomcat.password}" path="${Context(path)}${suffix}" war="${basedir}/${nomeprogetto}${suffix}.war" update="true" />
+		<!-- <deploy url="${tomcat.url}/manager/text" username="${tomcat.username}" password="${tomcat.password}" path="${Context(path)}${suffix}" war="${basedir}/${nomeprogetto}${suffix}.war" update="true" /> -->
+		<property name="deploy.ant.client.url" value="${tomcat.url}${Context(path)}${suffix}" />
+		<if>
+			<isset property="deploy.common.lib" />
+			<then>
+				<scp todir="${deploy.common.lib}"  trust="true">
+					<!-- <fileset refid="common.lib.path.ref.fileset" />-->
+					<fileset dir="dist/lib" excludes="**/doc/**" />
+				</scp>
+			</then>
+		</if>
+	</target>
+	<!--================================================================-->
+
+
+	<!--================================================================-->
+	<!--	deploy web di  test											-->
+
+	<target name="testdeploy" depends="-init" if="test.tomcat.url">
+		<echo message="Deploying file:///${basedir}/${nomeprogetto}.war to ${Context(path)}${suffix}" />
+
+		<deploy url="${test.tomcat.url}/manager" username="${test.tomcat.username}" password="${test.tomcat.password}" path="${Context(path)}.test" war="${basedir}/${nomeprogetto}${suffix}.war" update="true" />
+		<property name="deploy.ant.client.url" value="${tomcat.url}${Context(path)}.test" />
+		
+		
+		<!-- ******************************************************************
+		*************************Andrea 02/10/12
+		*************************Codice originale
+		
+		<deploy url="${test.tomcat.url}/manager" username="${test.tomcat.username}" password="${test.tomcat.password}" path="${Context(path)}${suffix}" war="${basedir}/${nomeprogetto}${suffix}.war" update="true" />
+			<property name="deploy.ant.client.url" value="${tomcat.url}${Context(path)}${suffix}" />
+			**********************************************************************-->
+		
+		<if>
+					<isset property="test.deploy.common.lib" />
+					<then>
+						<scp todir="${test.deploy.common.lib}" trust="true">
+							<!-- <fileset refid="common.lib.path.ref.fileset" />-->
+							<fileset dir="dist/lib" excludes="**/doc/**" />
+						</scp>
+					</then>
+				</if>
+	</target>
+	<!--================================================================-->
+
+	<!--================================================================-->
+	<!--	cancella il file webapps via telnet							-->
+
+	<target name="clean" if="tomcat5">
+
+		<telnet server="${host.name}" userid="${host.username}" password="${host.password}">
+			<read>${host.checkword}</read>
+			<write>net stop "Apache Tomcat" </write>
+			<!-- <read timeout="10" >arrestato.</read>-->
+			<read timeout="30">${host.checkword}</read>
+			<write>rd /s /q "${host.tomcat.home}\webapps\${Context(path)}${suffix}"</write>
+			<read timeout="30">${host.checkword}</read>
+			<write>del /s /q "${host.tomcat.home}\conf\Catalina\localhost\${Context(path)}${suffix}.xml"</write>
+			<read timeout="30">${host.checkword}</read>
+		</telnet>
+	</target>
+	<!--================================================================-->
+
+
+	<!--================================================================-->
+	<!--	fa partire tomcat via telent								-->
+
+	<target name="start" if="tomcat5">
+		<telnet server="${host.name}" userid="${host.username}" password="${host.password}">
+			<read>${host.checkword}</read>
+			<write>net start "Apache Tomcat" </write>
+			<read timeout="30">${host.checkword}</read>
+		</telnet>
+		<list url="${tomcat.url}/manager" username="${tomcat.username}" password="${tomcat.password}">
+		</list>
+	</target>
+	<!--================================================================-->
+
+	<!--================================================================-->
+	<!--	disconnessione via vpn										-->
+
+	<target name="vpn-disconnect" if="vpndeploy">
+		<exec executable="/bin/sh">
+			<arg line='-c "echo ${vpndeploy.sudopw} &#124; sudo -S vpnc-disconnect"' />
+		</exec>
+	</target>
+	<!--================================================================-->
+
+	<!--================================================================-->
+	<!--	connessione via vpn											-->
+
+	<target name="vpn-connect" if="vpndeploy">
+
+		<exec executable="/bin/sh">
+			<arg line='-c "echo ${vpndeploy.sudopw} &#124; sudo -S vpnc ${basedir}/conf/${vpndeploy.conf}"' />
+		</exec>
+	</target>
+	<!--================================================================-->
+
+
+
+	<target name="install.jar" depends="vpn-connect,deploy.jar,vpn-disconnect" />
+
+	<!--================================================================-->
+	<!--	deploy del jar 												-->
+
+	<target name="deploy.jar">
+		<echo message="Deploying file:///${basedir}/${nomeprogetto}.war to ${ftp.url}/${ftp.folder}" />
+
+		<antcall target="init-deploy.jar">
+		</antcall>
+		<antcall target="deploy.jar.lib">
+		</antcall>
+		<antcall target="deploy.jar.exe">
+		</antcall>
+	</target>
+	<!--================================================================-->
+	<!--	inizializzazione per il deploy jar							-->
+
+	<target name="init-deploy.jar">
+		<ftp action="mkdir" password="${ftp.password}" server="${ftp.url}" userid="${ftp.username}" remotedir="${ftp.folder}" />
+
+		<!--================================================================-->
+		<!-- 						Pierpaolo 06/08/10						-->
+		<!--				 nel caso di un mdeploy non si deve cancellare	-->
+		<!--				 la cartella ad ogni iterazione					-->
+		<!--================================================================-->
+
+
+		<ftp action="del" password="${ftp.password}" server="${ftp.url}" userid="${ftp.username}" remotedir="${ftp.folder}">
+			<fileset>
+				<include name="**/**/*" />
+			</fileset>
+		</ftp>
+	</target>
+	<!--================================================================-->
+
+	<!--================================================================-->
+	<!--	deploy jar lib												-->
+
+	<target name="deploy.jar.lib" if="javaprojectlib">
+		<ftp password="${ftp.password}" server="${ftp.url}" userid="${ftp.username}" remotedir="${ftp.folder}">
+			<fileset dir="${lib.home}" includes="${nomeprogetto}${suffix}.jar" />
+			<fileset dir="${lib.folder}" includes="*.jar" />
+		</ftp>
+	</target>
+	<!--================================================================-->
+
+
+	<!--================================================================-->
+	<!--	deploy jar exe												-->
+
+	<target name="deploy.jar.exe" if="javaprojectexe">
+		<ftp password="${ftp.password}" server="${ftp.url}" userid="${ftp.username}" remotedir="${ftp.folder}">
+			<fileset dir="." includes="${nomeprogetto}${suffix}.jar" />
+		</ftp>
+	</target>
+
+</project>
