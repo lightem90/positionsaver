@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="tsp" default="deploy">
+	<property name="lib.home" value="/archivio/deploy/lib" />
+	<property name="deploydir" value="deploy" />
+	<property name="lib.home" value="/archivio/deploy/lib" />
+	<property name="tomcat.home" value="" />
+	<property name="web.folder" value="." />
+	<property name="lib.folder" value="" />
+	<property name="javasource" value="." />
+	<property name="javasourcetest" value="." />
+	<property name="junit.output.dir" value="junit" />
+	<property name="documents" value="spec" />
+	<property name="gwt.args" value="" />
+	<property name="docbook.xsl.dir" value="/archivio/deploy/doc/docbook-xsl" />
+	<property name="eclipse.stylesheet" value="${docbook.xsl.dir}/eclipse/eclipse.xsl" />
+	<property name="html.stylesheet" value="${docbook.xsl.dir}/html/docbook.xsl" />
+	<property name="fo.stylesheet" value="${docbook.xsl.dir}/fo/profile-docbook.xsl" />
+	<property name="fo.slides" value="${docbook.xsl.dir}/slides/fo/plain.xsl" />
+
+	<property name="fo.presentazione" value="/archivio/deploy/doc/doc/presentazione.xsl" />
+	<property name="hibernate.stylesheet" value="/archivio/deploy/doc/doc/hibernate.xsl" />
+
+
+	<property name="ftp.url.offerte" value="server06" />
+	<property name="ftp.username.offerte" value="administrator" />
+	<property name="ftp.password.offerte" value="cv56py" />
+	<property name="ftp.folder.offerte" value="archivio/Documenti Amministrativi/Offerte/2011/off inviate" />
+
+	<property name="ftp.url.manuali" value="ftp.cartsoftware.eu" />
+	<property name="ftp.username.manuali" value="136898@aruba.it" />
+	<property name="ftp.password.manuali" value="23a7539bdd" />
+	<property name="ftp.folder.manuali" value="www.cartsoftware.eu/c/cg" />
+
+	<property name="ftp.url.doc" value="ftp.cartsoftware.eu" />
+	<property name="ftp.username.doc" value="136898@aruba.it" />
+	<property name="ftp.password.doc" value="23a7539bdd" />
+
+	<property name="suffix" value="" />
+	<property name="ftp.folder.doc" value="www.cartsoftware.eu/d/java/${nomeprogetto}${suffix}" />
+
+
+	<property name="suffix" value="" />
+
+	<property name="javahelp.stylesheet" value="${docbook.xsl.dir}/javahelp/javahelp.xsl" />
+	<property name="src.tmp" value="tmp" />
+	<property name="doc.dir" value="doc/manual" />
+	<path id="latest.classpath">
+		<path refid="lib.path.ref" />
+		<path refid="JUnit 4.libraryclasspath" />
+		<path refid="gwt" />
+		<path refid="Apache Tomcat v6.0 [Apache Tomcat v6.0].libraryclasspath" />
+		<path refid="Hibernate" />
+		<path refid="doc" />
+		<path refid="Hibernaterev" />
+		<path refid="webtest" />
+		<fileset dir="lib" includes="*.jar" />
+		<fileset dir="${web.folder}/${lib.folder}" includes="*.jar" />
+
+	</path>
+	<path id="lib.path.ref">
+		<fileset id="lib.path.ref.fileset" dir="${lib.home}" includes="${dipendenze} ${paramlib}" />
+	</path>
+
+
+	<path id="Hibernaterev">
+		<fileset dir="${lib.home}" includes="**/*.jar" />
+		<fileset dir="${lib.home}" includes="**/my*.jar" />
+		<fileset dir="${lib.home}" includes="**/oj*.jar" />
+	</path>
+
+	<!-- Making xalan available -->
+	<path id="xalan.class.path">
+		<pathelement location="${lib.home}/xalan/serializer.jar" />
+		<pathelement location="${lib.home}/xalan/xalan.jar" />
+		<pathelement location="${lib.home}/xalan/xercesImpl.jar" />
+		<pathelement location="${lib.home}/xalan/xml-apis.jar" />
+	</path>
+	<!--
+	<script language="javascript">
+			<![CDATA[ importClass(java.lang.System);
+			System.setProperty( "org.apache.xerces.xni.parser.XMLParserConfiguration", "org.apache.xerces.parsers.XIncludeParserConfiguration" ); ]]>
+		</script>
+-->
+	<!--<path id="toolslib">
+			<path location="lib/hibernate-tools.jar" />
+			<path location="lib/hibernate3.jar" />
+			<path location="lib/freemarker.jar" />
+			<path location="${jdbc.driver.jar}" />
+		</path>-->
+
+	<!-- i jar di junit sono già nell cartella lib-->
+	<path id="JUnit 4.libraryclasspath">
+		<fileset dir="${lib.home}" includes="junit*.*,*hamcrest*, ${debug.lib}" />
+	</path>
+	<!-- i jar di junit sono già nell cartella lib-->
+	<path id="Apache Tomcat v6.0 [Apache Tomcat v6.0].libraryclasspath">
+		<fileset dir="${tomcat.home}" includes="*.jar" />
+	</path>
+	<path id="Hibernate">
+		<fileset dir="${lib.home}/hibernate" includes="**/*.jar" />
+	</path>
+
+	<path id="Hibernaterev">
+		<fileset dir="${lib.home}/hibernate/tools" includes="**/*.jar" />
+
+	</path>
+	<path id="gwt">
+		<fileset dir="${lib.home}/gwt" includes="**/*.jar" />
+
+	</path>
+
+	<path id="webtest">
+		<fileset dir="${lib.home}/jwebunit" includes="**/*.jar" />
+	</path>
+
+	<path id="doc">
+		<fileset dir="${lib.home}/apiviz-1.3.1.GA/jar" includes="**/*.jar" />
+	</path>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${lib.home}/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" classpath="${lib.home}/fop/fop.jar" />
+	<mkdir dir="lib" />
+
+	<property name="deploy.classpath" refid="latest.classpath" />
+	<tstamp>
+		<format property="OGGI" pattern="yyyy.D" />
+		<format property="OGGIdata" pattern="dd MMMM yyyy" locale="it,IT" />
+
+	</tstamp>
+
+
+
+	<loadfile property="percorso" srcFile="./.svn/entries" failonerror="false">
+		<filterchain>
+			<headfilter lines="1" skip="4" />
+			<deletecharacters chars="\n" />
+		</filterchain>
+	</loadfile>
+
+
+
+
+	<target name="param">
+		<echo message="&lt;!ENTITY % param SYSTEM 'param.ent'>" file="${documents}/version.ent" />
+		<echo message="%param;" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY versione '${OGGI}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY nomefile '${nomeprogetto}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY datadioggi '${OGGIdata}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY clienterif '${clienterif}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY percorso '${percorso}'>" file="${documents}/version.ent" append="true" />
+
+
+
+		<echo message="&lt;!ENTITY referente '${referente}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY cod.attivazione '${cod.attivazione}'>" file="${documents}/version.ent" append="true" />
+
+		<echo message="&lt;!ENTITY cod.attivazione '${cod.attivazione}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY descrizione.attivazione '${descrizione.attivazione}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY prezzo.attivazione.gold '${prezzo.attivazione.gold}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY sconto.attivazione.gold '${sconto.attivazione.gold}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY totale.attivazione.gold '${totale.attivazione.gold}'>" file="${documents}/version.ent" append="true" />
+
+		<echo message="&lt;!ENTITY prezzo.attivazione.silver '${prezzo.attivazione.silver}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY sconto.attivazione.silver '${sconto.attivazione.silver}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY totale.attivazione.silver '${totale.attivazione.silver}'>" file="${documents}/version.ent" append="true" />
+
+
+		<echo message="&lt;!ENTITY cod.attivazione.due '${cod.attivazione.due}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY descrizione.attivazione.due '${descrizione.attivazione.due}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY prezzo.attivazione.due '${prezzo.attivazione.due}'>" file="${documents}/version.ent" append="true" />
+
+		<echo message="&lt;!ENTITY cliente '${cliente}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY prodotto '${prodotto}'>" file="${documents}/version.ent" append="true" />
+
+		<echo message="&lt;!ENTITY termini '${termini}'>" file="${documents}/version.ent" append="true" />
+
+
+		<echo message="&lt;!ENTITY corpo.presentazione '${corpo.presentazione}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY descrizione.assistenza '${descrizione.assistenza}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY prezzo.assistenza.gold '${prezzo.assistenza.gold}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY sconto.assistenza.gold '${sconto.assistenza.gold}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY totale.assistenza.gold '${totale.assistenza.gold}'>" file="${documents}/version.ent" append="true" />
+
+		<echo message="&lt;!ENTITY descrizione.hosting '${descrizione.hosting}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY prezzo.hosting.gold '${prezzo.hosting.gold}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY sconto.hosting.gold '${sconto.hosting.gold}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY totale.hosting.gold '${totale.hosting.gold}'>" file="${documents}/version.ent" append="true" />
+
+		<echo message="&lt;!ENTITY prezzo.assistenza.silver '${prezzo.assistenza.silver}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY sconto.assistenza.silver '${sconto.assistenza.silver}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY totale.assistenza.silver '${totale.assistenza.silver}'>" file="${documents}/version.ent" append="true" />
+
+
+		<echo message="&lt;!ENTITY prezzo.hosting.silver '${prezzo.hosting.silver}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY sconto.hosting.silver '${sconto.hosting.silver}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY totale.hosting.silver '${totale.hosting.silver}'>" file="${documents}/version.ent" append="true" />
+
+
+		<echo message="&lt;!ENTITY dettaglio.giornate SYSTEM '${dettaglio.giornate}'>" file="${documents}/version.ent" append="true" />
+
+
+		<echo message="&lt;!ENTITY descrizione.specifiche SYSTEM '${descrizione.specifiche}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY descrizione.introduzione SYSTEM '${descrizione.introduzione}'>" file="${documents}/version.ent" append="true" />
+		<echo message="&lt;!ENTITY offerta.introduzione SYSTEM '${offerta.introduzione}'>" file="${documents}/version.ent" append="true" />
+
+
+
+
+
+
+
+
+	</target>
+
+
+
+
+
+
+	<target name="deploy">
+
+		<antcall target="param" />
+		<antcall target="dbschema" />
+		<antcall target="apidoc" />
+		<antcall target="uml" />
+		<antcall target="wsdldocbook" />
+
+
+
+		<antcall target="docbook" />
+		<tstamp>
+			<format property="exec.time" pattern="MM/dd/yyyy hh:mm aa" />
+
+		</tstamp>
+		<echo message="terminato il ${exec.time}">
+		</echo>
+
+	</target>
+	<target name="dbschema" if="hibernate">
+
+		<!--<xslt style="${hibernate.stylesheet}" extension=".properties" basedir="${javasource}" 
+			in="${javasource}${hibernate}"
+				out="${src.tmp}${hibernate}.properties" force="true"> 
+				
+				
+				<param name="section.autolabel" expression="1" />
+				<classpath refid="latest.classpath" />
+			</xslt>
+		<property file="${src.tmp}${hibernate}.properties">
+			
+		</property>
+		-->
+
+
+		<echoproperties>
+		</echoproperties>
+		<property name="reports.dir" value="${basedir}" />
+		<java jar="${lib.home}/schemaSpy_5.0.0.jar" failonerror="yes" fork="true">
+			<arg line="-t mysql" />
+			<arg line="-host localhost" />
+			<arg line="-port 3306" />
+			<arg line="-db ftr" />
+			<arg line="-u ${connection.username}" />
+			<arg line="-p ${connection.password}" />
+			<arg line="-cp /archivio/deploy/lib/mysql-connector-java-5.1.8-bin.jar" />
+
+			<arg line="-o doc/db" />
+			<classpath refid="latest.classpath" />
+		</java>
+	</target>
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: name                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="apidoc" if="apidoc">
+		<mkdir dir="doc/java" />
+		<javadoc sourcepath="src" defaultexcludes="yes" destdir="doc/java" author="true" version="true" use="true" splitindex="true" failonerror="false" doclet="org.jboss.apiviz.APIviz" docletpath="/archivio/deploy/lib/apiviz-1.3.1.GA/jar/apiviz-1.3.1.GA.jar" additionalparam="-author -version">
+			<classpath refid="latest.classpath" />
+		</javadoc>
+
+	</target>
+
+
+
+
+	<!-- ================================= 
+          target: name              
+         ================================= -->
+	<target name="uml" description="description" if="apidoc">
+		<mkdir dir="doc/uml/images" />
+		<path id="project.path">
+			<pathelement path="${basedir}/src" />
+			<pathelement path="${basedir}/lib" />
+		</path>
+		<javadoc sourcepath="src" destdir="doc/uml" access="private">
+			<doclet name="org.umlgraph.doclet.UmlGraphDoc" path="/archivio/deploy/lib/umlgraph/UmlGraph-5.3.jar">
+				<!--<param name="-attributes" />
+				<param name="-enumerations" />
+				<param name="-enumconstants" />
+				<param name="-collapsible"/>
+				<param name="-qualify" />
+				<param name="-types" />
+				<param name="-visibility" />
+				<param name="-inferrel"/>
+				<param name="-operations" />
+				-->
+
+				<param name="-useimports" />
+
+				<param name="-inferdep" />
+				<param name="-hide" value="java.*" />
+				<param name="-collpackages" value="java.util.*" />
+				<param name="-qualify" />
+				<param name="-postfixpackage" />
+				<param name="-nodefontsize" value="9" />
+				<param name="-nodefontpackagesize" value="7" />
+				<param name="-link" value="http://java.sun.com/j2se/1.5.0/docs/guide/javadoc/doclet/spec" />
+				<param name="-link" value="http://java.sun.com/j2se/1.5/docs/api" />
+
+			</doclet>
+			<!--<doclet name="org.jboss.apiviz.APIviz" path="/archivio/deploy/lib/apiviz-1.3.1.GA/jar/apiviz-1.3.1.GA.jar">
+				<param name="-author" />
+				<param name="-version" />
+
+			</doclet>-->
+			<classpath refid="latest.classpath" />
+		</javadoc>
+		<apply executable="dot" dest="doc/uml" parallel="false">
+			<arg value="-Tpng" />
+			<arg value="-o" />
+			<targetfile />
+			<srcfile />
+			<fileset dir="doc/uml" includes="**/*.dot" />
+
+			<mapper type="glob" from="*.dot" to="*.png" />
+		</apply>
+		<apply executable="fdp" dest="spec" parallel="false">
+			<arg value="-Tpng" />
+			<arg value="-o" />
+			<arg value="-v" />
+			<targetfile />
+			<srcfile />
+
+			<fileset dir="spec" includes="**/*.fdp" />
+			<mapper type="glob" from="*.fdp" to="*.png" />
+		</apply>
+
+		<antcall target="dot">
+		</antcall>
+
+		<antcall target="pic">
+		</antcall>
+
+	</target>
+
+	<!-- ================================= 
+          target: name              
+         ================================= -->
+	<target name="pic" description="description">
+		<apply executable="pic2plot" parallel="false" dir="/archivio/deploy/lib/umlgraph/">
+			<arg value="-Tsvg" />
+			<!--<arg value="-n"/>-->
+			<arg line="--page-size letter,xsize=5in,ysize=5in" />
+			<!--<targetfile/>-->
+			<srcfile />
+			<fileset dir="${documents}" includes="**/*.pic" />
+			<!--<mapper refid="output"/>-->
+			<redirector>
+				<outputmapper id="out" type="glob" from="*.pic" to="${documents}/*.svg" />
+
+			</redirector>
+
+			<!--<mapper type="glob" from="*.pic" to="*.png"/>-->
+		</apply>
+
+	</target>
+
+
+	<!-- ================================= 
+          target: dot              
+         ================================= -->
+	<target name="dot" description="genera diagrammi">
+		<apply executable="dot" dest="spec" parallel="false" dir="spec" force="true">
+			<arg value="-Tsvg" />
+			<arg value="-o" />
+			<arg value="-v" />
+
+			<targetfile />
+			<srcfile />
+
+			<fileset dir="spec" includes="**/*.dot" />
+			<mapper type="glob" from="*.dot" to="*.svg" />
+		</apply>
+		<apply executable="dot" dest="spec" parallel="false" dir="spec" force="true" relative="true">
+			<arg value="-Tpng" />
+			<arg value="-o" />
+
+			<targetfile />
+			<srcfile />
+
+			<fileset dir="spec" includes="**/*.dot" />
+			<mapper type="glob" from="*.dot" to="*.png" />
+		</apply>
+	</target>
+
+	<target name="docbook" description="description">
+		<delete dir="${src.tmp}">
+		</delete>
+		<mkdir dir="${src.tmp}" />
+		<!--<delete dir="${doc.dir}"/>-->
+
+
+		<antcall target="presentazione">
+		</antcall>
+		<antcall target="build-pdf">
+		</antcall>
+		<antcall target="build-html">
+		</antcall>
+		<!--<antcall target="build-slide"/>-->
+
+
+		<!--
+		<xslt style="/archivio/deploy/doc/docbook-xsl/slides/svg/default.xsl" extension=".svg" basedir="${documents}" destdir="${src.tmp}" force="true">
+			<include name="**/slides.docbook" />
+
+			<param name="section.autolabel" expression="1" />
+			<param name="profile.condition" expression="${offerta.tipo}" />
+			<param name="draft.mode" expression="no" />
+
+			<param name="paper.type" expression="A4" />
+
+
+
+
+			<compositemapper>
+				<packagemapper from="*slides.docbook" to="*${nomeprogetto}${suffix}.${OGGI}.svg" />
+
+			</compositemapper>
+
+
+
+
+			<classpath refid="latest.classpath" />
+		</xslt>
+-->
+	</target>
+
+	<target name="build-pdf">
+
+		<echo message="offerta.tipomm ${offerta.tipo}" />
+
+		<!-- Questa parte gestisce la compilaizone FO nello stile vecchio per compatibilità con i file presi dalla cartella spec -->
+		<xslt style="${fo.stylesheet}" extension=".fo" basedir="${documents}" destdir="${src.tmp}" force="true">
+			<include name="**/index.docbook" />
+
+			<param name="section.autolabel" expression="1" />
+			<param name="chapter.autolabel" expression="1" />
+			<param name="section.label.includes.component.label" expression="1" />
+			<param name="component.label.includes.part.label" expression="1" />
+			<param name="label.from.part" expression="1" />
+			<param name="section.autolabel.max.depth" expression="2" />
+			<param name="ulink.show" expression="0" />
+
+
+
+
+
+			<param name="profile.condition" expression="${offerta.tipo}" />
+			<param name="draft.mode" expression="no" />
+
+			<param name="paper.type" expression="A4" />
+
+
+			<!--
+					<param name="section.label.includes.component.label" expression="1" />
+				
+					<param name="manifest.in.base.dir" expression="0" />
+
+					<param name="generate.section.toc.level" expression="5" />
+					<param name="toc.max.depth" expression="3" />
+
+					<param name="ulink.target" expression="_self" />
+					<param name="suppress.navigation" expression="0" />
+					<param name="use.id.as.filename" expression="1" />
+					<param name="chapter.autolabel" expression="1" />
+					
+					
+					<outputproperty name="method" value="xml" />
+					<outputproperty name="standalone" value="yes" />
+					<outputproperty name="encoding" value="iso8859_1" />
+					<outputproperty name="indent" value="es" />
+
+		-->
+
+			<compositemapper>
+				<packagemapper from="*index.docbook" to="*${nomeprogetto}${suffix}.${OGGI}.fo" />
+
+			</compositemapper>
+
+
+
+
+			<classpath refid="latest.classpath" />
+		</xslt>
+		<!-- Convert DocBook Files into FO -->
+		<!-- Questa parte gestisce la compilaizone FO nel nuovo stile con i file presi dalla cartella "offerta" -->
+		<xslt style="${fo.stylesheet}" extension=".fo" basedir="offerta" destdir="${src.tmp}" force="true">
+			<include name="**/*index.docbook" />
+
+			<param name="section.autolabel" expression="1" />
+			<param name="chapter.autolabel" expression="1" />
+			<param name="section.label.includes.component.label" expression="1" />
+			<param name="component.label.includes.part.label" expression="1" />
+			<param name="label.from.part" expression="1" />
+			<param name="section.autolabel.max.depth" expression="12" />
+
+			<param name="ulink.show" expression="0" />
+
+
+
+			<param name="profile.condition" expression="${offerta.tipo}" />
+			<param name="draft.mode" expression="no" />
+
+			<param name="paper.type" expression="A4" />
+
+
+			<!--
+			<param name="section.label.includes.component.label" expression="1" />
+		
+			<param name="manifest.in.base.dir" expression="0" />
+
+			<param name="generate.section.toc.level" expression="5" />
+			<param name="toc.max.depth" expression="3" />
+
+			<param name="ulink.target" expression="_self" />
+			<param name="suppress.navigation" expression="0" />
+			<param name="use.id.as.filename" expression="1" />
+			<param name="chapter.autolabel" expression="1" />
+			
+			
+			<outputproperty name="method" value="xml" />
+			<outputproperty name="standalone" value="yes" />
+			<outputproperty name="encoding" value="iso8859_1" />
+			<outputproperty name="indent" value="es" />
+
+-->
+
+			<compositemapper>
+				<packagemapper from="*index.docbook" to="*${nomeprogetto}${suffix}.${OGGI}.fo" />
+
+			</compositemapper>
+
+
+
+
+			<classpath refid="latest.classpath" />
+		</xslt>
+		<echo message="basedir=${basedir}/${documents}">
+		</echo>
+		<!-- Convert FO Files into pdf -->
+		<fop format="application/pdf" outdir="${doc.dir}" force="true" basedir="${basedir}/${documents}">
+			<fileset dir="${src.tmp}">
+				<include name="**/*.fo" />
+			</fileset>
+
+		</fop>
+		<ant antfile="${deploydir}/mergepdf.xml" target="deploy" inheritall="true" dir="${basedir}">
+
+
+		</ant>
+		<antcall target="archivia">
+		</antcall>
+
+
+	</target>
+
+	<target name="build-slide">
+
+		<echo message="offerta.tipomm ${offerta.tipo}" />
+		<!-- Convert DocBook Files into FO -->
+		<xslt style="${fo.slides}" extension=".fo" basedir="${documents}" destdir="${src.tmp}" force="true">
+			<include name="**/slides.docbook" />
+
+			<param name="section.autolabel" expression="1" />
+			<param name="profile.condition" expression="${offerta.tipo}" />
+			<param name="draft.mode" expression="no" />
+
+			<param name="paper.type" expression="A4" />
+
+
+
+
+			<compositemapper>
+				<packagemapper from="*slides.docbook" to="*${nomeprogetto}${suffix}.${OGGI}.fo" />
+
+			</compositemapper>
+
+
+
+
+			<classpath refid="latest.classpath" />
+		</xslt>
+		<echo message="basedir=${basedir}/${documents}">
+		</echo>
+		<!-- Convert FO Files into pdf -->
+		<fop format="application/pdf" outdir="${doc.dir}" force="true" basedir="${basedir}/${documents}">
+			<fileset dir="${src.tmp}">
+				<include name="**/*.fo" />
+			</fileset>
+
+		</fop>
+
+		<antcall target="archivia">
+		</antcall>
+
+
+	</target>
+	<target name="archivia">
+
+		<if>
+			<isset property="archivia.offerte" />
+			<then>
+
+				<ftp password="${ftp.password.offerte}" server="${ftp.url.offerte}" userid="${ftp.username.offerte}" remotedir="${ftp.folder.offerte}">
+					<fileset dir="${doc.dir}" includes="*offerta*" />
+				</ftp>
+			</then>
+
+		</if>
+
+		<if>
+			<isset property="archivia.manuali" />
+			<then>
+
+				<!--<copy file="${deploydir}/redirect.html" tofile="${doc.dir}/index.html" overwrite="true" />
+						<replace file="${doc.dir}/index.html" token="@redirect@" value="${nomeprogetto}${suffix}.${OGGI}.pdf" >
+						
+							
+							
+						</replace>-->
+
+				<ftp action="mkdir" password="${ftp.password.manuali}" server="${ftp.url.manuali}" userid="${ftp.username.manuali}" remotedir="${ftp.folder.manuali}">
+				</ftp>
+				<ftp password="${ftp.password.manuali}" server="${ftp.url.manuali}" userid="${ftp.username.manuali}" remotedir="${ftp.folder.manuali}">
+					<fileset dir="${doc.dir}" includes="*${nomeprogetto}${suffix}*">
+					</fileset>
+				</ftp>
+			</then>
+
+		</if>
+		<if>
+			<isset property="archivia.doc" />
+			<then>
+				<ftp action="mkdir" password="${ftp.password.doc}" server="${ftp.url.doc}" userid="${ftp.username.doc}" remotedir="${ftp.folder.doc}">
+
+				</ftp>
+				<ftp action="delete" password="${ftp.password.doc}" server="${ftp.url.doc}" userid="${ftp.username.doc}" remotedir="${ftp.folder.doc}" skipfailedtransfers="yes">
+					<fileset>
+
+						<include name="**" />
+					</fileset>
+				</ftp>
+
+				<ftp passive="true" password="${ftp.password.doc}" server="${ftp.url.doc}" userid="${ftp.username.doc}" remotedir="${ftp.folder.doc}">
+					<fileset dir="${basedir}/doc/uml" />
+				</ftp>
+			</then>
+
+		</if>
+
+
+
+
+	</target>
+
+	<target name="wsdldocbook">
+		<xslt style="${docbook.xsl.dir}/wsdl/wsdl2docbook.xsl" extension=".docbook" basedir="${web.folder}" destdir="${documents}" force="true">
+			<include name="**/*.wsdl" />
+			<include name="**/*.xsd" />
+			<param name="section.autolabel" expression="1" />
+			<param name="wsdl.documentation" expression="${basedir}/${documents}/wsdl/wsdldoc.xml" />
+
+			<classpath refid="latest.classpath" />
+		</xslt>
+
+
+
+	</target>
+
+
+
+
+	<target name="presentazione">
+		<!-- Convert DocBook Files into FO -->
+		<xslt style="${fo.presentazione}" extension=".fo" basedir="offerta" destdir="${src.tmp}" force="true">
+			<include name="**/*.xml" />
+
+			<param name="section.autolabel" expression="1" />
+			<param name="profile.condition" expression="${offerta.tipo}" />
+			<compositemapper>
+				<packagemapper from="*.xml" to="*.${nomeprogetto}${suffix}.${OGGI}.fo" />
+
+			</compositemapper>
+			<classpath refid="latest.classpath" />
+		</xslt>
+		<echo message="basedir=${basedir}/${documents}">
+		</echo>
+
+	</target>
+
+	<target name="build-html" description="Generates HTML files from DocBook XML" if="dochtml">
+		<xslt style="${html.stylesheet}" extension=".html" basedir="${documents}" destdir="${doc.dir}" force="true">
+
+			<include name="**/index.docbook" />
+
+			<param name="html.stylesheet" expression="style.css" />
+			<classpath refid="xalan.class.path" />
+		</xslt>
+
+		<!-- Copy the stylesheet to the same directory as the HTML files -->
+		<copy todir="${doc.dir}">
+			<fileset dir="lib">
+				<include name="style.css" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="jdepend">
+
+		<jdepend format="xml" outputfile="doc/jdepend-report.xml">
+			<exclude name="java.*" />
+			<exclude name="javax.*" />
+			<classespath>
+				<pathelement location="bin" />
+			</classespath>
+			<classpath location="bin" />
+
+		</jdepend>
+
+		<style basedir="doc" destdir="doc" includes="jdepend-report.xml" style="${ant.home}/etc/jdepend.xsl" />
+
+	</target>
+
+</project>

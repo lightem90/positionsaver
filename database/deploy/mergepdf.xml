@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tsp" default="deploy">
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="/archivio/deploy/lib/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	<property name="doc.dir" value="doc/manual" />
+	<property name="documents" value="/home/andreacosta/helios/eu.cartsc.carsharing.carma.pagamenti.cartacredito.web/spec" />
+	<property name="nomeprogetto" value="prova" />
+	<property name="suffix" value="aa" />
+	<property name="OGGI" value="123" />
+	<property name="mergelist" value="**/*credito.pdf" />
+
+
+	<path id="mergelistid">
+		<fileset id="mergelistid.fileset" dir="${doc.dir}" includes="${mergelist}" />
+		<fileset id="mergelistid.fileset" dir="${documents}" includes="${mergelist}" />
+
+		<!-- <fileset dir="${documents}" includes="**/*.pdf" />-->
+	</path>
+
+	<!-- 
+	<target name="deploy">
+		<path id="docs">
+			<fileset dir="${documents}" includes="**/*index.docbook" />
+		</path>
+		<property name="myproperty" refid="docs" />
+		<echo message="****${myproperty}" />
+		<pathconvert property="merge" refid="docs" pathsep=",">
+			<compositemapper>
+				<globmapper from="${basedir}/*" to="./*" />
+
+				
+				<packagemapper from="${documents}**/*index.docbook" to="*${nomeprogetto}${suffix}.${OGGI}.fo" />
+
+			</compositemapper>
+		</pathconvert>
+
+		<echo message="propietà ${merge}">
+		</echo>
+
+		<foreach list="${merge}" param="deploy" target="merge" inheritall="true">
+			<param name="ref" value="../" />
+		</foreach>
+
+	</target>-->
+
+	<target name="deploy">
+		<path id="pippo">
+			<fileset dir="${doc.dir}" includes="*presentazione*.pdf" />
+		</path>
+
+		<pathconvert property="merge" refid="pippo" pathsep=",">
+
+		</pathconvert>
+
+		<echo message="merge ${merge}">
+		</echo>
+
+		<foreach list="${merge}" param="deploy" target="merge" inheritall="true">
+			<param name="ref" value="../" />
+		</foreach>
+	</target>
+	<target name="merge">
+
+
+		<pathconvert property="extrapdf" refid="mergelistid" pathsep=" " />
+
+
+		<propertyregex property="propB" input="${deploy}" regexp="presentazione." replace="" global="true" />
+		<propertyregex property="verbale" input="${deploy}" regexp="presentazione." replace="verbale." global="true" />
+		<propertyregex property="collaudo" input="${deploy}" regexp="presentazione." replace="collaudo." global="true" />
+
+
+
+		<echo message="deploy ${deploy}" />
+		<echo message="deploy ${propB}" />
+		<echo message="deploy ${extrapdf}" />
+		<echo message="deploy ${verbale}" />
+
+
+		<java jar="/archivio/deploy/lib/pdfbox-app-1.6.0.jar" failonerror="no" fork="true">
+			<arg line="PDFMerger" />
+			<arg line="${verbale}" />
+			<arg line="${collaudo}" />
+
+
+
+
+			<arg line="${collaudo}" />
+		</java>
+		<delete file="${verbale}" />
+
+
+		<java jar="/archivio/deploy/lib/pdfbox-app-1.6.0.jar" failonerror="no" fork="true">
+			<arg line="PDFMerger" />
+			<arg line="${deploy}" />
+			<arg line="${propB}" />
+
+			<arg line="${extrapdf}" />
+
+
+			<arg line="${propB}" />
+		</java>
+		<delete file="${deploy}" />
+	</target>
+</project>

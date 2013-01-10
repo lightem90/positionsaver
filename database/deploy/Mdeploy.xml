@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+        Procedura automatica di deploy di uno stesso progetto con diversi
+        file di configurazione.
+
+
+
+-->
+
+<project name="mdeploy" default="build">
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="/archivio/deploy/lib/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+
+	<property name="deploydir" value="deploy" />
+	<property name="php" value="" />
+
+	<!--	=======================================
+	<echo message="la deploydir in mdeploy è ${deploydir}" />
+	<echo message="la base dir in mdeploy è ${basedir}" />
+	<echo message="la base dir in mdeploy è ${basedir}" />
+ 	<property name="basedir" value="${basedir}/.." />
+ 	<echo message="la base dir in mdeploy2 è ${basedir}" />
+	<echo message="dependency sono  è ${depen}" />
+			======================================= -->
+	<!--========================================
+        	Compiliamo prima le dipendenze
+		========================================-->
+	<echo message="dependency sono  è ${depen}" />
+	<target name="dependency">
+		<foreach list="${depen}" param="dep" target="deploy" inheritall="true">
+			<param name="deploy" value="" />
+			<param name="suffix." value="" />
+			<!-- Andrea 10/11/12 -->
+			<!--<param name="paramlib." value="" />-->
+
+		</foreach>
+	</target>
+
+	<!--========================================
+           poi faciamo il deploy multiplo
+       ========================================-->
+	<target name="mdeploy" depends="dependency">
+		<foreach list="${deploym}" param="deploy" target="deploy" inheritall="true">
+			<param name="ref" value="../" />
+		</foreach>
+	</target>
+
+	<target name="mdoc">
+		<foreach list="${deploym}" param="deploy" target="doc" inheritall="true">
+			<param name="ref" value="../" />
+		</foreach>
+	</target>
+
+
+	<target name="deploy">
+		<propertycopy name="suffix" from="suffix.${deploy}" silent="true" />
+		<if>
+
+			<isset property="paramlib.${deploy}" />
+
+			<then>
+				<propertycopy name="paramlib" from="paramlib.${deploy}" silent="true" />
+			</then>
+
+		</if>
+
+		<property name="ref" value="../../${dep}/" />
+		<!--======================================
+		<echo message="la ref è :${ref}" />
+		<echo message="file ${ref}deploy.properties" />
+		<echo message="deploydir è ${deploydir}" />
+		<echo message="basedir  è ${basedir}" />
+		==========================================-->
+		<propertycopy name="tomcat.url" from="tomcat.url.${deploy}" silent="true" />
+		<propertycopy name="tomcat.username" from="tomcat.username.${deploy}" silent="true" />
+		<propertycopy name="tomcat.password" from="tomcat.password.${deploy}" silent="true" />
+
+		<propertycopy name="ftp.url" from="ftp.url.${deploy}" silent="true" />
+		<propertycopy name="ftp.username" from="ftp.username.${deploy}" silent="true" />
+		<propertycopy name="ftp.password" from="ftp.password.${deploy}" silent="true" />
+		<propertycopy name="ftp.folder" from="ftp.folder.${deploy}" silent="true" />
+		<propertycopy name="javasourcewebtest" from="javasourcewebtest.${deploy}" silent="true" />
+
+		<ant antfile="${deploydir}/deploy${php}.xml" target="deploy" inheritall="true" dir="${basedir}/${ref}">
+
+			<property file="${ref}deploy.properties" />
+
+		</ant>
+	</target>
+
+	<target name="doc">
+		<propertycopy name="suffix" from="suffix.${deploy}" silent="true" />
+		<propertycopy name="paramlib" from="paramlib.${deploy}" silent="true" />
+		<property name="ref" value="../../${dep}/" />
+		<!--======================================
+		<echo message="la ref è :${ref}" />
+		<echo message="file ${ref}deploy.properties" />
+		<echo message="deploydir è ${deploydir}" />
+		<echo message="basedir  è ${basedir}" />
+		
+		==========================================-->
+		<propertycopy name="tomcat.url" from="tomcat.url.${deploy}" silent="true" />
+		<propertycopy name="tomcat.username" from="tomcat.username.${deploy}" silent="true" />
+		<propertycopy name="tomcat.password" from="tomcat.password.${deploy}" silent="true" />
+
+		<propertycopy name="ftp.url.offerta" from="ftp.url.offerta.${deploy}" silent="true" />
+		<propertycopy name="ftp.username.offerta" from="ftp.username.offerta.${deploy}" silent="true" />
+		<propertycopy name="ftp.password.offerta" from="ftp.password.offerta.${deploy}" silent="true" />
+		<propertycopy name="ftp.folder.offerta" from="ftp.folder.offerta.${deploy}" silent="true" />
+
+		<propertycopy name="ftp.url.manuali" from="ftp.url.manuali.${deploy}" silent="true" />
+		<propertycopy name="ftp.username.manuali" from="ftp.username.manuali.${deploy}" silent="true" />
+		<propertycopy name="ftp.password.manuali" from="ftp.password.manuali.${deploy}" silent="true" />
+		<propertycopy name="ftp.folder.manuali" from="ftp.folder.manuali.${deploy}" silent="true" />
+
+		<propertycopy name="offerta.tipo" from="offerta.tipo.${deploy}" silent="true" />
+
+		<propertycopy name="clienterif" from="clienterif.${deploy}" silent="true" />
+		<propertycopy name="referente" from="referente.${deploy}" silent="true" />
+		<propertycopy name="mergelist" from="mergelist.${deploy}" silent="true" />
+
+		<propertycopy name="descrizione.attivazione" from="descrizione.attivazione.${deploy}" silent="true" />
+
+		<propertycopy name="descrizione.assistenza" from="descrizione.assistenza.${deploy}" silent="true" />
+
+		<propertycopy name="prezzo.attivazione.gold" from="prezzo.attivazione.gold.${deploy}" silent="true" />
+		<propertycopy name="sconto.attivazione.gold" from="sconto.attivazione.gold.${deploy}" silent="true" />
+		<propertycopy name="totale.attivazione.gold" from="totale.attivazione.gold.${deploy}" silent="true" />
+
+
+		<propertycopy name="prezzo.assistenza.gold" from="prezzo.assistenza.gold.${deploy}" silent="true" />
+		<propertycopy name="sconto.assistenza.gold" from="sconto.assistenza.gold.${deploy}" silent="true" />
+		<propertycopy name="totale.assistenza.gold" from="totale.assistenza.gold.${deploy}" silent="true" />
+
+
+		<propertycopy name="prezzo.hosting.gold" from="prezzo.hosting.gold.${deploy}" silent="true" />
+		<propertycopy name="sconto.hosting.gold" from="sconto.hosting.gold.${deploy}" silent="true" />
+		<propertycopy name="totale.hosting.gold" from="totale.hosting.gold.${deploy}" silent="true" />
+
+
+		<propertycopy name="prezzo.attivazione.silver" from="prezzo.attivazione.silver.${deploy}" silent="true" />
+		<propertycopy name="sconto.attivazione.silver" from="sconto.attivazione.silver.${deploy}" silent="true" />
+		<propertycopy name="totale.attivazione.silver" from="totale.attivazione.silver.${deploy}" silent="true" />
+
+
+		<propertycopy name="prezzo.assistenza.silver" from="prezzo.assistenza.silver.${deploy}" silent="true" />
+		<propertycopy name="sconto.assistenza.silver" from="sconto.assistenza.silver.${deploy}" silent="true" />
+		<propertycopy name="totale.assistenza.silver" from="totale.assistenza.silver.${deploy}" silent="true" />
+
+
+		<propertycopy name="prezzo.hosting.silver" from="prezzo.hosting.silver.${deploy}" silent="true" />
+		<propertycopy name="sconto.hosting.silver" from="sconto.hosting.silver.${deploy}" silent="true" />
+		<propertycopy name="totale.hosting.silver" from="totale.hosting.silver.${deploy}" silent="true" />
+
+		<propertycopy name="corpo.presentazione" from="corpo.presentazione.${deploy}" silent="true" />
+
+		<propertycopy name="prodotto" from="prodotto.${deploy}" silent="true" />
+
+
+		<ant antfile="${deploydir}/doc.xml" target="deploy" inheritall="true" dir="${basedir}/${ref}">
+
+			<property file="${ref}deploy.properties" />
+
+		</ant>
+	</target>
+
+
+	<!--<target depends="dependency" name="build"/>-->
+	<target depends="mdeploy" name="build" />
+
+
+
+
+
+</project>
+
+
